@@ -1,15 +1,20 @@
-/*	Ghostbusters texture converter
+/*	Ghostbusters The Video Game Texture Converter
+    Copyright barncastle
     Copyright 2010 Jonathan Wilson
+    Copyright 2024 KeyofBlueS
 
     The Ghostbusters texture converter is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License as published by the Free
-    Software Foundation; either version 2, or (at your option) any later
+    Software Foundation; either version 3, or (at your option) any later
     version. See the file COPYING for more details.
 */
 #include <stdio.h>
 #include <string.h>
-typedef unsigned long       DWORD;
-typedef unsigned char       BYTE;
+#include <stdint.h>  // For uint32_t, uint8_t
+#include <stdlib.h>  // For strdup
+
+typedef uint32_t DWORD;
+typedef uint8_t BYTE;
 
 #define MAKEFOURCC(ch0, ch1, ch2, ch3) \
             ((DWORD)(BYTE)(ch0) | ((DWORD)(BYTE)(ch1) << 8) | \
@@ -54,16 +59,16 @@ constexpr DWORD DDS_HEADER_FLAGS_MIPMAP =     0x00020000;  // DDSD_MIPMAPCOUNT;
 constexpr DWORD DDS_HEADER_FLAGS_VOLUME =     0x00800000;  // DDSD_DEPTH;
 constexpr DWORD DDS_HEADER_FLAGS_PITCH =      0x00000008;  // DDSD_PITCH;
 constexpr DWORD DDS_HEADER_FLAGS_LINEARSIZE = 0x00080000;  // DDSD_LINEARSIZE;
-constexpr DWORD DDS_SURFACE_FLAGS_TEXTURE =   0x00001000; // DDSCAPS_TEXTURE
-constexpr DWORD DDS_SURFACE_FLAGS_MIPMAP =    0x00400008; // DDSCAPS_COMPLEX | DDSCAPS_MIPMAP
-constexpr DWORD DDS_SURFACE_FLAGS_CUBEMAP =   0x00000008; // DDSCAPS_COMPLEX
-constexpr DWORD DDS_CUBEMAP_POSITIVEX =       0x00000600; // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEX
-constexpr DWORD DDS_CUBEMAP_NEGATIVEX =       0x00000a00; // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEX
-constexpr DWORD DDS_CUBEMAP_POSITIVEY =       0x00001200; // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEY
-constexpr DWORD DDS_CUBEMAP_NEGATIVEY =       0x00002200; // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEY
-constexpr DWORD DDS_CUBEMAP_POSITIVEZ =       0x00004200; // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEZ
-constexpr DWORD DDS_CUBEMAP_NEGATIVEZ =       0x00008200; // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEZ
-constexpr DWORD DDS_FLAGS_VOLUME =            0x00200000; // DDSCAPS2_VOLUME
+constexpr DWORD DDS_SURFACE_FLAGS_TEXTURE =   0x00001000;  // DDSCAPS_TEXTURE
+constexpr DWORD DDS_SURFACE_FLAGS_MIPMAP =    0x00400008;  // DDSCAPS_COMPLEX | DDSCAPS_MIPMAP
+constexpr DWORD DDS_SURFACE_FLAGS_CUBEMAP =   0x00000008;  // DDSCAPS_COMPLEX
+constexpr DWORD DDS_CUBEMAP_POSITIVEX =       0x00000600;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEX
+constexpr DWORD DDS_CUBEMAP_NEGATIVEX =       0x00000a00;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEX
+constexpr DWORD DDS_CUBEMAP_POSITIVEY =       0x00001200;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEY
+constexpr DWORD DDS_CUBEMAP_NEGATIVEY =       0x00002200;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEY
+constexpr DWORD DDS_CUBEMAP_POSITIVEZ =       0x00004200;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEZ
+constexpr DWORD DDS_CUBEMAP_NEGATIVEZ =       0x00008200;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEZ
+constexpr DWORD DDS_FLAGS_VOLUME =            0x00200000;  // DDSCAPS2_VOLUME
 
 constexpr DWORD DDS_CUBEMAP_ALLFACES = DDS_CUBEMAP_POSITIVEX | DDS_CUBEMAP_NEGATIVEX | \
                                        DDS_CUBEMAP_POSITIVEY | DDS_CUBEMAP_NEGATIVEY | \
@@ -103,11 +108,14 @@ int main(int argc, char* argv[])
 {
     FILE* tex, * dds;
 
-    if (fopen_s(&tex, argv[1], "rb") != 0) {
+    // Replace fopen_s with fopen
+    tex = fopen(argv[1], "rb");
+    if (!tex) {
         return 0;
     }
 
-    char* c = _strdup(argv[1]);
+    // Replace _strdup with strdup for Linux
+    char* c = strdup(argv[1]);  
     c[strlen(c) - 3] = 'd';
     c[strlen(c) - 2] = 'd';
     c[strlen(c) - 1] = 's';
@@ -168,7 +176,8 @@ int main(int argc, char* argv[])
         break;
     }
 
-    if (fopen_s(&dds, c, "wb") != 0) {
+    dds = fopen(c, "wb");
+    if (!dds) {
         return 0;
     }
 
