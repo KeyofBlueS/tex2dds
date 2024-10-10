@@ -12,7 +12,11 @@ To compile the tool on Linux, use the following command:
 # How to Use:
 
 Run the converter by providing the path to a TEX file:
-`./tex2dds path_to_texture.tex`
+tex2dds input_texture.tex [OPTIONS]
+
+Options:
+  -o, --output <output_file.dds>  Specify the output DDS file path and name
+  -h, --help                      Show this help message and exit
 
 
 # Credits:
