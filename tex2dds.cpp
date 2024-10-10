@@ -1,4 +1,4 @@
-/*	Ghostbusters The Video Game Texture Converter
+/*  Ghostbusters The Video Game Texture Converter
     Copyright 2010 Jonathan Wilson
     Copyright barncastle
     Copyright 2024 KeyofBlueS
@@ -9,6 +9,7 @@
     either version 3, or (at your option) any later version.
     See the file COPYING for more details.
 */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>  // For uint32_t, uint8_t
@@ -68,7 +69,7 @@ constexpr DWORD DDS_CUBEMAP_NEGATIVEX =       0x00000a00;  // DDSCAPS2_CUBEMAP |
 constexpr DWORD DDS_CUBEMAP_POSITIVEY =       0x00001200;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEY
 constexpr DWORD DDS_CUBEMAP_NEGATIVEY =       0x00002200;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEY
 constexpr DWORD DDS_CUBEMAP_POSITIVEZ =       0x00004200;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEZ
-constexpr DWORD DDS_CUBEMAP_NEGATIVEZ =       0x00008200;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEZ
+constexpr DWORD DDS_CUBEMAP_NEGATIVEZ =       0x00008200;  // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_NEGATIVEZ;
 constexpr DWORD DDS_FLAGS_VOLUME =            0x00200000;  // DDSCAPS2_VOLUME
 
 constexpr DWORD DDS_CUBEMAP_ALLFACES = DDS_CUBEMAP_POSITIVEX | DDS_CUBEMAP_NEGATIVEX | \
@@ -105,21 +106,64 @@ struct TEX_Header
     DWORD dwUnknown30;
 };
 
+// Function to display the help message
+void display_help(const char* prog_name) {
+    printf("\nDescription:\n");
+    printf("  This tool converts texture files for Ghostbusters: The Video Game (2009) and\n");
+    printf("  Ghostbusters: The Video Game Remastered (2019) from TEX format to DDS.\n");
+    printf("\nUsage: %s input_texture.tex [OPTIONS]\n", prog_name);
+    printf("\nOptions:\n");
+    printf("  -o, --output <output_file.dds>  Specify the output DDS file path and name\n");
+    printf("  -h, --help                      Show this help message and exit\n");
+}
+
 int main(int argc, char* argv[])
 {
-    FILE* tex, * dds;
+    const char* input_file = nullptr;
+    const char* output_file = nullptr;
 
-    // Replace fopen_s with fopen
-    tex = fopen(argv[1], "rb");
-    if (!tex) {
-        return 0;
+    // Parse arguments for options and input file
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "-o") == 0 || strcmp(argv[i], "--output") == 0) {
+            if (i + 1 < argc) {
+                output_file = argv[i + 1];
+                ++i;  // Skip next argument since it's the output file name
+            } else {
+                printf("Error: No output file specified.\n");
+                return 1;
+            }
+        } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+            display_help(argv[0]);
+            return 0;
+        } else if (input_file == nullptr) {
+            input_file = argv[i];
+        } else {
+            printf("Error: Unknown option or extra argument '%s'\n", argv[i]);
+            return 1;
+        }
     }
 
-    // Replace _strdup with strdup for Linux
-    char* c = strdup(argv[1]);  
-    c[strlen(c) - 3] = 'd';
-    c[strlen(c) - 2] = 'd';
-    c[strlen(c) - 1] = 's';
+    if (!input_file) {
+        printf("Error: No input file specified.\n");
+        return 1;
+    }
+
+    FILE* tex = fopen(input_file, "rb");
+    if (!tex) {
+        printf("Error: Failed to open input file '%s'.\n", input_file);
+        return 1;
+    }
+
+    char* output_path;
+    if (output_file) {
+        output_path = strdup(output_file);
+    } else {
+        // Generate output file path from input file by replacing ".tex" with ".dds"
+        output_path = strdup(input_file);
+        output_path[strlen(output_path) - 3] = 'd';
+        output_path[strlen(output_path) - 2] = 'd';
+        output_path[strlen(output_path) - 1] = 's';
+    }
 
     TEX_Header header;
     fread(&header, sizeof(header), 1, tex);
@@ -134,8 +178,7 @@ int main(int argc, char* argv[])
     desc.dwHeight = header.dwHeight;
     desc.dwWidth = header.dwWidth;
 
-    if (header.dwMipCount != 0)
-    {
+    if (header.dwMipCount != 0) {
         desc.dwHeaderFlags |= DDS_HEADER_FLAGS_MIPMAP;
         desc.dwMipMapCount = header.dwMipCount + 1;
         desc.dwSurfaceFlags |= DDS_SURFACE_FLAGS_MIPMAP;
@@ -177,14 +220,18 @@ int main(int argc, char* argv[])
         break;
     }
 
-    dds = fopen(c, "wb");
+    FILE* dds = fopen(output_path, "wb");
     if (!dds) {
-        return 0;
+        printf("Error: Failed to create output file '%s'.\n", output_path);
+        return 1;
     }
 
     fwrite(&DDS_MAGIC, 4, 1, dds);
     fwrite(&desc, sizeof(desc), 1, dds);
     fwrite(texdata, size, 1, dds);
-    fclose(dds);    
+    fclose(dds);
+
+    printf("Conversion complete. Output saved to: %s\n", output_path);
     return 0;
 }
+
