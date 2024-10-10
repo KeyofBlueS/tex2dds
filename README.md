@@ -12,13 +12,14 @@ To compile the tool on Linux, use the following command:
 # How to Use:
 
 Run the converter by providing the path to a TEX file:
-tex2dds input_texture.tex [OPTIONS]
-
+```sh
+$ ./tex2dds input_texture.tex [OPTIONS]
+```
+```
 Options:
   -o, --output <output_file.dds>  Specify the output DDS file path and name
   -h, --help                      Show this help message and exit
-
-
+```
 # Credits:
 
 The original code was developed by Jonathan Wilson and barncastle. This version extends the tool with added support for Linux.
