@@ -1,25 +1,52 @@
-# Ghostbusters The Video Game Texture Converter
+# Ghostbusters: The Video Game Remastered Asset Converters
 
-This tool is designed to convert texture files from the TEX format used in Ghostbusters: The Video Game (2009) and Ghostbusters: The Video Game Remastered (2019) into the DDS (DirectDraw Surface) format.
+hese tools are designed to convert texture (TEX <-> DDS) and audio (SMP <-> OGG) assets for use in Ghostbusters: The Video Game and its remastered version.
+
+- **tex2dds**: Converts TEX files to DDS for both the original and remastered versions of Ghostbusters: The Video Game.
+- **dds2tex**: Converts DDS files back to TEX (tested with the remastered version, theoretically compatible with the original).
+- **smp2ogg**: Converts SMP audio files to OGG for the remastered game.
+- **ogg2smp**: Converts OGG audio files back to SMP for the remastered game.
 
 
-# How to Build:
+# Build Instructions:
 
-To compile the tool on Linux, use the following command:
-`g++ -o tex2dds tex2dds.cpp`
+To compile these tools on Linux, use the following command:
 
+`g++ -static -o <toolname> <toolname>.cpp`
 
-# How to Use:
+To cross-compile for Windows (from Linux), use:
 
-Run the converter by providing the path to a TEX file:
+`x86_64-w64-mingw32-g++ -static -o <toolname> <toolname>.cpp`
+
+# Usage:
+
+Run the converter by specifying the input asset file:
 ```sh
-$ ./tex2dds input_texture.tex [OPTIONS]
+$ ./<toolname> <input_file> [OPTIONS]
 ```
 ```
 Options:
-  -o, --output <output_file.dds>  Specify the output DDS file path and name
-  -h, --help                      Show this help message and exit
+  -o, --output <output_file>        Specify the output file path and name
+  -q, --quiet                       Disable output messages
+  -h, --help                        Show this help message and exit
 ```
+
+Alternatively, you can drag and drop an asset file onto the executable.
+
+
+# Mass convert assets
+
+Scripts for batch processing multiple assets are available on NexusMods:
+
+[GBTVGR tex2dds Mass Converter](https://www.nexusmods.com/ghostbustersthevideogameremastered/mods/51)
+
+[GBTVGR dds2tex Mass Converter](https://www.nexusmods.com/ghostbustersthevideogameremastered/mods/48)
+
+[GBTVGR smp2ogg Mass Converter](https://www.nexusmods.com/ghostbustersthevideogameremastered/mods/50)
+
+[GBTVGR ogg2smp Mass Converter](https://www.nexusmods.com/ghostbustersthevideogameremastered/mods/47)
+
+
 # Credits:
 
-The original code was developed by Jonathan Wilson and barncastle. This version extends the tool with added support for Linux.
+The original tex2dds code was developed by Jonathan Wilson and barncastle.
