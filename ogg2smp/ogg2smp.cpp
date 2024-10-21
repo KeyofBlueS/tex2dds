@@ -185,10 +185,10 @@ int main(int argc, char* argv[]) {
         return 3;
     }
 
-	// Get file size and reverse the bytes
-	std::streamsize dimension_bytes = getFileSize(inputFile);
-	std::string dimension_hex = intToHex(static_cast<uint32_t>(dimension_bytes));
-	std::string dimension_hex_rev = reverseBytes(dimension_hex);
+    // Get file size and reverse the bytes
+    std::streamsize dimension_bytes = getFileSize(inputFile);
+    std::string dimension_hex = intToHex(static_cast<uint32_t>(dimension_bytes));
+    std::string dimension_hex_rev = reverseBytes(dimension_hex);
 
     // Create output directory if not exists
     createDirectories(pathTo);
@@ -200,27 +200,27 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-	// Prepare and write the 160 bytes header
-	outFile.put(0x06);                           // Header byte
-	addPadding(outFile, 3);                     // Zero padding (3 bytes)
-	outFile.put(0x4b);
-	outFile.put(0x65);
-	outFile.put(0x79);
-	outFile.put(0x6f);
-	outFile.put(0x66);
-	outFile.put(0x42);
-	outFile.put(0x6c);
-	outFile.put(0x75);
-	outFile.put(0x65);
-	outFile.put(0x53);
-	addPadding(outFile, 14);                     // Zero padding (14 bytes)
-	outFile.put(0xa0);                           // Header byte
-	addPadding(outFile, 3);                      // Zero padding (3 bytes)
-	outFile.write(hexToByteString(dimension_hex_rev).c_str(), 4);    // Write dimension data (4 bytes)
-	addPadding(outFile, 12);                     // Zero padding (12 bytes)
-	outFile.put(0x44);                           // Header byte
-	outFile.put(0xac);                           // Header byte
-	addPadding(outFile, 110);                    // Final zero padding (110 bytes)
+    // Prepare and write the 160 bytes header
+    outFile.put(0x06);                          // Header byte
+    addPadding(outFile, 3);                     // Zero padding (3 bytes)
+    outFile.put(0x4b);
+    outFile.put(0x65);
+    outFile.put(0x79);
+    outFile.put(0x6f);
+    outFile.put(0x66);
+    outFile.put(0x42);
+    outFile.put(0x6c);
+    outFile.put(0x75);
+    outFile.put(0x65);
+    outFile.put(0x53);
+    addPadding(outFile, 14);                     // Zero padding (14 bytes)
+    outFile.put(0xa0);                           // Header byte
+    addPadding(outFile, 3);                      // Zero padding (3 bytes)
+    outFile.write(hexToByteString(dimension_hex_rev).c_str(), 4);    // Write dimension data (4 bytes)
+    addPadding(outFile, 12);                     // Zero padding (12 bytes)
+    outFile.put(0x44);                           // Header byte
+    outFile.put(0xac);                           // Header byte
+    addPadding(outFile, 110);                    // Final zero padding (110 bytes)
 
     // Append the input OGG file
     std::ifstream inFile(inputFile, std::ios::binary);
